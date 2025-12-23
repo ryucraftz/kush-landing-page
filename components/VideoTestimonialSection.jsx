@@ -12,32 +12,16 @@ import client9 from "../src/assets/Video Testimonials/09.mp4";
 
 export default function VideoTestimonialSection({
   title = "Your Future Transformation Starts With Stories Like These.",
-  videos = [client1, client2, client3, client4, client5, client6, client7, client8,client9],
+  videos = [client1, client2, client3, client4, client5, client6, client7, client8, client9],
 }) {
   const items = useMemo(() => videos.map((src, i) => ({ src, id: `vid-${i}` })), [videos]);
 
-  // DESKTOP carousel state (3 visible)
-  const VISIBLE_DESKTOP = 3;
-  const [index, setIndex] = useState(0);
-
-  const maxIndex = Math.max(0, items.length - VISIBLE_DESKTOP);
-  const normalize = (next) => {
-    if (maxIndex === 0) return 0;
-    if (next < 0) return maxIndex;
-    if (next > maxIndex) return 0;
-    return next;
-  };
-
-  const viewportRef = useRef(null);
-  const trackRef = useRef(null);
-  const stepPxRef = useRef(0);
-  const hasAutoShiftedRef = useRef(false);
-
   /* ===========================
-     ✅ MOBILE AUTO-MUTE FIX
+     ✅ MOBILE AUTO-MUTE + ONE-SOUND
      =========================== */
   const videoMapRef = useRef(new Map()); // id -> HTMLVideoElement
   const activeSoundIdRef = useRef(null);
+  const [activeSoundId, setActiveSoundId] = useState(null);
   const rafRef = useRef(null);
 
   const isMobileNow = () =>
@@ -58,29 +42,28 @@ export default function VideoTestimonialSection({
   const muteActiveIfOffscreen = () => {
     if (!isMobileNow()) return;
 
-    const activeId = activeSoundIdRef.current;
-    if (!activeId) return;
+    const id = activeSoundIdRef.current;
+    if (!id) return;
 
-    const v = videoMapRef.current.get(activeId);
+    const v = videoMapRef.current.get(id);
     if (!v) {
       activeSoundIdRef.current = null;
+      setActiveSoundId(null);
       return;
     }
 
-    // If the video is fullscreen (some mobiles do this), don't auto-mute
-    // iOS Safari uses webkitDisplayingFullscreen
+    // don't auto-mute if fullscreen
     if (v.webkitDisplayingFullscreen) return;
     if (document.fullscreenElement && document.fullscreenElement === v) return;
 
     const rect = v.getBoundingClientRect();
     const vh = window.innerHeight || 0;
-
-    // "Not visible" = completely out of viewport
     const completelyOut = rect.bottom <= 0 || rect.top >= vh;
 
     if (completelyOut) {
       v.muted = true;
       activeSoundIdRef.current = null;
+      setActiveSoundId(null);
     }
   };
 
@@ -88,16 +71,17 @@ export default function VideoTestimonialSection({
     const v = videoMapRef.current.get(id);
     if (!v) return;
 
-    // User unmuted this video -> make it the only one with sound
+    // user unmuted this -> only this can have sound
     if (!v.muted) {
       activeSoundIdRef.current = id;
+      setActiveSoundId(id);
       muteAllExcept(id);
       return;
     }
 
-    // If user muted the active one
     if (activeSoundIdRef.current === id) {
       activeSoundIdRef.current = null;
+      setActiveSoundId(null);
     }
   };
 
@@ -105,14 +89,30 @@ export default function VideoTestimonialSection({
     const v = videoMapRef.current.get(id);
     if (!v) return;
 
-    // If a video starts playing while unmuted, enforce "only this one has sound"
     if (!v.muted) {
       activeSoundIdRef.current = id;
+      setActiveSoundId(id);
       muteAllExcept(id);
     }
   };
 
-  // ✅ Mobile: on scroll/resize, auto-mute if the unmuted video went off-screen
+  // keep checking while a video is unmuted on mobile
+  useEffect(() => {
+    if (!isMobileNow()) return;
+    if (!activeSoundId) return;
+
+    let raf = 0;
+    const loop = () => {
+      muteActiveIfOffscreen();
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+
+    return () => cancelAnimationFrame(raf);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeSoundId]);
+
+  // also check on scroll/resize (cheap)
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -137,86 +137,33 @@ export default function VideoTestimonialSection({
       window.removeEventListener("orientationchange", onScroll);
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
-  }, []);
-  /* =========================== */
-
-  const recalcStep = () => {
-    const track = trackRef.current;
-    if (!track) return;
-    const firstCard = track.querySelector("[data-card='true']");
-    if (!firstCard) return;
-    const gap = parseFloat(getComputedStyle(track).gap || "0") || 0;
-    const w = firstCard.getBoundingClientRect().width || 0;
-    stepPxRef.current = w + gap;
-  };
-
-  const applyTransform = (idx) => {
-    const track = trackRef.current;
-    if (!track) return;
-    if (!stepPxRef.current) recalcStep();
-    track.style.transform = `translate3d(${-idx * stepPxRef.current}px, 0, 0)`;
-  };
-
-  // Desktop: init + resize
-  useEffect(() => {
-    const isDesktop = () =>
-      typeof window !== "undefined" && !window.matchMedia("(max-width: 639px)").matches;
-
-    if (!isDesktop()) return;
-
-    recalcStep();
-    applyTransform(index);
-
-    const onResize = () => {
-      if (!isDesktop()) return;
-      recalcStep();
-      applyTransform(index);
-    };
-
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Desktop: move track on index change
-  useEffect(() => {
-    const isDesktop =
-      typeof window !== "undefined" && !window.matchMedia("(max-width: 639px)").matches;
-    if (!isDesktop) return;
-    applyTransform(index);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [index]);
+  /* ===========================
+     ✅ MOBILE FULLSCREEN ON TAP
+     =========================== */
+  const openFullscreen = async (id) => {
+    if (!isMobileNow()) return;
 
-  // Desktop: auto shift by 3 when visible (ONLY desktop)
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const isMobile = window.matchMedia("(max-width: 639px)").matches;
-    if (isMobile) return;
+    const v = videoMapRef.current.get(id);
+    if (!v) return;
 
-    const el = viewportRef.current;
-    if (!el) return;
+    // user gesture: try play then fullscreen
+    try {
+      await v.play();
+    } catch {}
 
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const e = entries[0];
-        if (!e?.isIntersecting) return;
-        if (hasAutoShiftedRef.current) return;
-        hasAutoShiftedRef.current = true;
+    try {
+      if (v.requestFullscreen) await v.requestFullscreen();
+      else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
+      else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); // iPhone Safari
+    } catch {}
 
-        setTimeout(() => {
-          setIndex((prev) => normalize(prev + 3));
-        }, 350);
-      },
-      { threshold: 0.35 }
-    );
-
-    obs.observe(el);
-    return () => obs.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [maxIndex]);
-
-  const goPrev = () => setIndex((p) => normalize(p - 1));
-  const goNext = () => setIndex((p) => normalize(p + 1));
+    try {
+      await v.play();
+    } catch {}
+  };
 
   return (
     <section className="relative w-full bg-white overflow-hidden">
@@ -228,91 +175,141 @@ export default function VideoTestimonialSection({
           {title}
         </h2>
 
+        {/* ✅ Real horizontal scroll + scrollbar visible + auto rolling */}
         <div className="mt-10">
-          {/* ✅ MOBILE: one video below another */}
-          <div className="sm:hidden">
-            <div className="rounded-[26px] border border-gray-200 bg-gradient-to-b from-orange-50/70 via-white to-white shadow-[0_18px_55px_rgba(0,0,0,0.10)] px-4 py-7">
-              <div className="flex flex-col gap-5">
-                {items.map((it) => (
-                  <div key={it.id} className="w-full">
-                    <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                      <div className="relative aspect-[9/16] bg-gray-100">
-                        <video
-                          ref={setVideoRef(it.id)}
-                          onVolumeChange={() => handleVolumeChange(it.id)}
-                          onPlay={() => handlePlay(it.id)}
-                          src={it.src}
-                          className="h-full w-full object-cover"
-                          autoPlay
-                          loop
-                          muted
-                          playsInline
-                          controls
-                          preload="metadata"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+          <div className="rounded-[26px] border border-gray-200 bg-gradient-to-b from-orange-50/70 via-white to-white shadow-[0_18px_55px_rgba(0,0,0,0.10)]">
+            <VideoScrollRow
+              items={items}
+              autoPxPerSec={22} // ✅ lower = slower auto rolling
+              setVideoRef={setVideoRef}
+              onVolumeChange={handleVolumeChange}
+              onPlay={handlePlay}
+              onFullscreen={openFullscreen}
+            />
           </div>
 
-          {/* DESKTOP: 3 cards + arrows + auto shift */}
-          <div className="hidden sm:block relative">
-            <div className="relative rounded-[26px] border border-gray-200 bg-gradient-to-b from-orange-50/70 via-white to-white shadow-[0_18px_55px_rgba(0,0,0,0.10)] overflow-hidden">
-              <div ref={viewportRef} className="relative overflow-hidden px-6 py-8">
-                <div
-                  ref={trackRef}
-                  className="flex gap-5 will-change-transform transition-transform duration-700 ease-[cubic-bezier(.2,.8,.2,1)]"
-                  style={{ transform: "translate3d(0,0,0)" }}
-                >
-                  {items.map((it) => (
-                    <div
-                      key={it.id}
-                      data-card="true"
-                      className="shrink-0 basis-[calc((100%-40px)/3)]"
-                    >
-                      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-                        <div className="relative aspect-[9/16] bg-gray-100">
-                          <video
-                            src={it.src}
-                            className="h-full w-full object-cover"
-                            autoPlay
-                            loop
-                            muted
-                            playsInline
-                            controls
-                            preload="metadata"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={goPrev}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-white border border-gray-200 shadow-md hover:scale-105 active:scale-95 transition grid place-items-center"
-                aria-label="Previous"
-              >
-                ‹
-              </button>
-
-              <button
-                type="button"
-                onClick={goNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 h-10 w-10 rounded-full bg-white border border-gray-200 shadow-md hover:scale-105 active:scale-95 transition grid place-items-center"
-                aria-label="Next"
-              >
-                ›
-              </button>
-            </div>
-          </div>
+          <p className="mt-3 text-xs sm:text-sm text-gray-500 text-center">
+            Use the scrollbar below to move left/right. Auto-roll pauses while you interact.
+            Mobile: tap video to open fullscreen.
+          </p>
         </div>
       </div>
     </section>
+  );
+}
+
+function VideoScrollRow({
+  items,
+  autoPxPerSec = 22,
+  setVideoRef,
+  onVolumeChange,
+  onPlay,
+  onFullscreen,
+}) {
+  const scrollerRef = useRef(null);
+
+  const rafRef = useRef(0);
+  const lastTsRef = useRef(0);
+  const dirRef = useRef(1); // 1 => right, -1 => left
+
+  const holdRef = useRef(false); // user interacting
+  const pauseUntilRef = useRef(0);
+
+  const pauseFor = (ms = 1200) => {
+    const t = Date.now() + ms;
+    if (t > pauseUntilRef.current) pauseUntilRef.current = t;
+  };
+
+  const isPaused = () => holdRef.current || Date.now() < pauseUntilRef.current;
+
+  useEffect(() => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    const step = (ts) => {
+      if (!lastTsRef.current) lastTsRef.current = ts;
+      const dt = (ts - lastTsRef.current) / 1000;
+      lastTsRef.current = ts;
+
+      const max = el.scrollWidth - el.clientWidth;
+
+      if (!isPaused() && max > 0) {
+        let next = el.scrollLeft + dirRef.current * autoPxPerSec * dt;
+
+        // bounce at ends (keeps normal scrollbar behavior)
+        if (next >= max) {
+          next = max;
+          dirRef.current = -1;
+        } else if (next <= 0) {
+          next = 0;
+          dirRef.current = 1;
+        }
+
+        el.scrollLeft = next;
+      }
+
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      lastTsRef.current = 0;
+    };
+  }, [autoPxPerSec]);
+
+  return (
+    <div className="px-4 sm:px-6 py-7">
+      <div
+        ref={scrollerRef}
+        className="overflow-x-auto pb-3"
+        style={{
+          WebkitOverflowScrolling: "touch",
+          touchAction: "pan-x pan-y",
+        }}
+        onMouseEnter={() => (holdRef.current = true)}
+        onMouseLeave={() => {
+          holdRef.current = false;
+          pauseFor(900);
+        }}
+        onTouchStart={() => (holdRef.current = true)}
+        onTouchEnd={() => {
+          holdRef.current = false;
+          pauseFor(1200);
+        }}
+        onPointerDown={() => (holdRef.current = true)}
+        onPointerUp={() => {
+          holdRef.current = false;
+          pauseFor(1200);
+        }}
+        onScroll={() => pauseFor(1500)}
+      >
+        <div className="flex w-max gap-5">
+          {items.map((it) => (
+            <div key={it.id} className="shrink-0 w-[min(82vw,320px)] sm:w-[360px]">
+              <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+                <div className="relative aspect-[9/16] bg-gray-100">
+                  <video
+                    ref={setVideoRef(it.id)}
+                    onVolumeChange={() => onVolumeChange(it.id)}
+                    onPlay={() => onPlay(it.id)}
+                    onClick={() => onFullscreen(it.id)} // ✅ mobile tap fullscreen
+                    src={it.src}
+                    className="h-full w-full object-cover"
+                    autoPlay
+                    loop
+                    muted
+                    playsInline
+                    controls
+                    preload="metadata"
+                  />
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }

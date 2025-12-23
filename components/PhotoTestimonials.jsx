@@ -2,7 +2,6 @@
 import React from "react";
 import { Quote } from "lucide-react";
 
-// ✅ Import your testimonial images (update count as you have)
 import t1 from "../src/assets/Image Testimonials/1.png";
 import t2 from "../src/assets/Image Testimonials/2.png";
 import t3 from "../src/assets/Image Testimonials/3.jpeg";
@@ -46,7 +45,17 @@ export default function PhotoTestimonials() {
 
   return (
     <section className="relative bg-white py-10 sm:py-16 overflow-hidden">
-      {/* background accents */}
+      <style>{`
+        @keyframes hn_marquee {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .hn-marquee:hover .hn-track {
+          animation-play-state: paused;
+        }
+      `}</style>
+
+      {/* background accents (keep or remove — your choice) */}
       <div className="pointer-events-none absolute -top-20 left-1/2 h-72 w-72 -translate-x-1/2 rounded-full bg-sky-200/60 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-sky-100/70 blur-3xl" />
 
@@ -126,14 +135,10 @@ export default function PhotoTestimonials() {
           </p>
         </div>
 
-        {/* Cards */}
+        {/* ✅ ONE ROW marquee (no white edge fade) */}
         <div className="mt-8 sm:mt-12">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-7">
-            {DATA.map((t, idx) => (
-              <div key={idx} className="w-full">
-                <PhotoTestimonialCard img={t.img} />
-              </div>
-            ))}
+          <div className="hn-marquee overflow-hidden rounded-3xl border border-sky-200 bg-white shadow-sm">
+            <MarqueeRow items={DATA} speed={90} />
           </div>
 
           <div className="mt-6 rounded-3xl border border-sky-200 bg-white p-4 sm:p-5 shadow-sm">
@@ -151,10 +156,34 @@ export default function PhotoTestimonials() {
   );
 }
 
+function MarqueeRow({ items, speed = 90 }) {
+  const doubled = [...items, ...items];
+
+  return (
+    <div className="overflow-hidden">
+      <div
+        className="hn-track flex w-max gap-5 sm:gap-6 py-4 will-change-transform"
+        style={{
+          animation: `hn_marquee ${speed}s linear infinite`,
+        }}
+      >
+        {doubled.map((t, idx) => (
+          <div
+            key={idx}
+            className="shrink-0 w-[min(85vw,360px)] sm:w-[min(65vw,360px)] md:w-[360px]"
+          >
+            <PhotoTestimonialCard img={t.img} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function PhotoTestimonialCard({ img }) {
   return (
     <div className="rounded-3xl overflow-hidden bg-white border border-gray-100 shadow-sm">
-      {/* ✅ fixed frame; use object-contain so nothing gets cut */}
+      {/* ✅ same height as before */}
       <div className="relative h-64 sm:h-72 md:h-80 w-full bg-white p-3 sm:p-4">
         <img
           src={img}
@@ -162,8 +191,6 @@ function PhotoTestimonialCard({ img }) {
           loading="lazy"
           className="h-full w-full object-contain"
         />
-
-        {/* subtle fade (very light) */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/0 via-transparent to-black/0" />
       </div>
     </div>
