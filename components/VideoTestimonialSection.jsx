@@ -14,12 +14,21 @@ export default function VideoTestimonialSection({
   title = "Your Future Transformation Starts With Stories Like These.",
   videos = [client1, client2, client3, client4, client5, client6, client7, client8, client9],
 }) {
-  const items = useMemo(() => videos.map((src, i) => ({ src, id: `vid-${i}` })), [videos]);
+  const baseItems = useMemo(
+    () => videos.map((src, i) => ({ src, id: `vid-${i}` })),
+    [videos]
+  );
+
+  // ✅ duplicate for seamless desktop marquee + seamless mobile auto-scroll wrap
+  const renderItems = useMemo(() => {
+    const doubled = [...baseItems, ...baseItems];
+    return doubled.map((it, idx) => ({ ...it, rid: `${it.id}-${idx}` })); // unique id per rendered card
+  }, [baseItems]);
 
   /* ===========================
      ✅ MOBILE AUTO-MUTE + ONE-SOUND
      =========================== */
-  const videoMapRef = useRef(new Map()); // id -> HTMLVideoElement
+  const videoMapRef = useRef(new Map()); // rid -> HTMLVideoElement
   const activeSoundIdRef = useRef(null);
   const [activeSoundId, setActiveSoundId] = useState(null);
   const rafRef = useRef(null);
@@ -27,72 +36,75 @@ export default function VideoTestimonialSection({
   const isMobileNow = () =>
     typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches;
 
-  const setVideoRef = (id) => (node) => {
-    if (node) videoMapRef.current.set(id, node);
-    else videoMapRef.current.delete(id);
+  const setVideoRef = (rid) => (node) => {
+    if (node) videoMapRef.current.set(rid, node);
+    else videoMapRef.current.delete(rid);
   };
 
-  const muteAllExcept = (keepId) => {
-    videoMapRef.current.forEach((v, id) => {
+  const muteAllExcept = (keepRid) => {
+    videoMapRef.current.forEach((v, rid) => {
       if (!v) return;
-      if (id !== keepId) v.muted = true;
+      if (rid !== keepRid) v.muted = true;
     });
   };
 
   const muteActiveIfOffscreen = () => {
     if (!isMobileNow()) return;
 
-    const id = activeSoundIdRef.current;
-    if (!id) return;
+    const rid = activeSoundIdRef.current;
+    if (!rid) return;
 
-    const v = videoMapRef.current.get(id);
+    const v = videoMapRef.current.get(rid);
     if (!v) {
       activeSoundIdRef.current = null;
       setActiveSoundId(null);
       return;
     }
 
-    // don't auto-mute if fullscreen
+    // fullscreen exceptions
     if (v.webkitDisplayingFullscreen) return;
     if (document.fullscreenElement && document.fullscreenElement === v) return;
 
     const rect = v.getBoundingClientRect();
     const vh = window.innerHeight || 0;
-    const completelyOut = rect.bottom <= 0 || rect.top >= vh;
+    const vw = window.innerWidth || 0;
 
-    if (completelyOut) {
+    // consider both vertical + horizontal offscreen (important for horizontal scroll)
+    const outV = rect.bottom <= 0 || rect.top >= vh;
+    const outH = rect.right <= 0 || rect.left >= vw;
+
+    if (outV || outH) {
       v.muted = true;
       activeSoundIdRef.current = null;
       setActiveSoundId(null);
     }
   };
 
-  const handleVolumeChange = (id) => {
-    const v = videoMapRef.current.get(id);
+  const handleVolumeChange = (rid) => {
+    const v = videoMapRef.current.get(rid);
     if (!v) return;
 
-    // user unmuted this -> only this can have sound
     if (!v.muted) {
-      activeSoundIdRef.current = id;
-      setActiveSoundId(id);
-      muteAllExcept(id);
+      activeSoundIdRef.current = rid;
+      setActiveSoundId(rid);
+      muteAllExcept(rid);
       return;
     }
 
-    if (activeSoundIdRef.current === id) {
+    if (activeSoundIdRef.current === rid) {
       activeSoundIdRef.current = null;
       setActiveSoundId(null);
     }
   };
 
-  const handlePlay = (id) => {
-    const v = videoMapRef.current.get(id);
+  const handlePlay = (rid) => {
+    const v = videoMapRef.current.get(rid);
     if (!v) return;
 
     if (!v.muted) {
-      activeSoundIdRef.current = id;
-      setActiveSoundId(id);
-      muteAllExcept(id);
+      activeSoundIdRef.current = rid;
+      setActiveSoundId(rid);
+      muteAllExcept(rid);
     }
   };
 
@@ -143,13 +155,12 @@ export default function VideoTestimonialSection({
   /* ===========================
      ✅ MOBILE FULLSCREEN ON TAP
      =========================== */
-  const openFullscreen = async (id) => {
+  const openFullscreen = async (rid) => {
     if (!isMobileNow()) return;
 
-    const v = videoMapRef.current.get(id);
+    const v = videoMapRef.current.get(rid);
     if (!v) return;
 
-    // user gesture: try play then fullscreen
     try {
       await v.play();
     } catch {}
@@ -167,7 +178,15 @@ export default function VideoTestimonialSection({
 
   return (
     <section className="relative w-full bg-white overflow-hidden">
-      {/* ✅ orange -> blue */}
+      <style>{`
+        @keyframes hn_marquee_left {
+          from { transform: translateX(0); }
+          to { transform: translateX(-50%); }
+        }
+        .hn-marquee:hover .hn-track { animation-play-state: paused; }
+      `}</style>
+
+      {/* blue accents */}
       <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-sky-200/45 blur-3xl" />
       <div className="pointer-events-none absolute -bottom-28 -right-24 h-80 w-80 rounded-full bg-sky-300/35 blur-3xl" />
 
@@ -176,18 +195,30 @@ export default function VideoTestimonialSection({
           {title}
         </h2>
 
-        {/* ✅ Real horizontal scroll + scrollbar visible + auto rolling */}
         <div className="mt-10">
-          {/* ✅ orange -> blue gradient */}
           <div className="rounded-[26px] border border-gray-200 bg-gradient-to-b from-sky-50/80 via-white to-white shadow-[0_18px_55px_rgba(0,0,0,0.10)]">
-            <VideoScrollRow
-              items={items}
-              autoPxPerSec={22} // lower = slower auto rolling
-              setVideoRef={setVideoRef}
-              onVolumeChange={handleVolumeChange}
-              onPlay={handlePlay}
-              onFullscreen={openFullscreen}
-            />
+            {/* ✅ MOBILE: manual horizontal scroll + auto-roll LEFT */}
+            <div className="sm:hidden">
+              <VideoScrollRowMobile
+                items={renderItems}
+                autoPxPerSec={22} // lower = slower
+                setVideoRef={setVideoRef}
+                onVolumeChange={handleVolumeChange}
+                onPlay={handlePlay}
+                onFullscreen={openFullscreen}
+              />
+            </div>
+
+            {/* ✅ DESKTOP: continuous rolling marquee */}
+            <div className="hidden sm:block hn-marquee overflow-hidden">
+              <VideoMarqueeRowDesktop
+                items={renderItems}
+                speedSec={55} // bigger = slower
+                setVideoRef={setVideoRef}
+                onVolumeChange={handleVolumeChange}
+                onPlay={handlePlay}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -195,7 +226,11 @@ export default function VideoTestimonialSection({
   );
 }
 
-function VideoScrollRow({
+/* =========================================================
+   ✅ MOBILE: Manual scrollbar + Auto rolling LEFT (seamless)
+   Fix: ignores scroll events caused by auto-roll
+   ========================================================= */
+function VideoScrollRowMobile({
   items,
   autoPxPerSec = 22,
   setVideoRef,
@@ -207,10 +242,13 @@ function VideoScrollRow({
 
   const rafRef = useRef(0);
   const lastTsRef = useRef(0);
-  const dirRef = useRef(1); // 1 => right, -1 => left
+  const halfRef = useRef(0);
 
   const holdRef = useRef(false); // user interacting
   const pauseUntilRef = useRef(0);
+
+  // ✅ ignore programmatic scroll events
+  const ignoreScrollUntilRef = useRef(0);
 
   const pauseFor = (ms = 1200) => {
     const t = Date.now() + ms;
@@ -219,30 +257,50 @@ function VideoScrollRow({
 
   const isPaused = () => holdRef.current || Date.now() < pauseUntilRef.current;
 
+  const recalcHalf = () => {
+    const el = scrollerRef.current;
+    if (!el) return;
+
+    // width of one full set (because items are doubled)
+    halfRef.current = el.scrollWidth / 2;
+
+    // start in the middle so rolling LEFT has content
+    if (halfRef.current > 0 && el.scrollLeft < 2) {
+      el.scrollLeft = halfRef.current;
+      ignoreScrollUntilRef.current = Date.now() + 120;
+    }
+  };
+
   useEffect(() => {
     const el = scrollerRef.current;
     if (!el) return;
+
+    // Recalc multiple times to catch layout/video loading
+    requestAnimationFrame(recalcHalf);
+    const t1 = setTimeout(recalcHalf, 150);
+    const t2 = setTimeout(recalcHalf, 600);
+
+    const onResize = () => recalcHalf();
+    window.addEventListener("resize", onResize);
 
     const step = (ts) => {
       if (!lastTsRef.current) lastTsRef.current = ts;
       const dt = (ts - lastTsRef.current) / 1000;
       lastTsRef.current = ts;
 
-      const max = el.scrollWidth - el.clientWidth;
+      const half = halfRef.current;
+      if (!isPaused() && half > 0) {
+        // ✅ roll LEFT by default
+        const next = el.scrollLeft - autoPxPerSec * dt;
 
-      if (!isPaused() && max > 0) {
-        let next = el.scrollLeft + dirRef.current * autoPxPerSec * dt;
-
-        // bounce at ends (keeps normal scrollbar behavior)
-        if (next >= max) {
-          next = max;
-          dirRef.current = -1;
-        } else if (next <= 0) {
-          next = 0;
-          dirRef.current = 1;
-        }
+        // mark upcoming scroll events as "auto"
+        ignoreScrollUntilRef.current = Date.now() + 80;
 
         el.scrollLeft = next;
+
+        // seamless wrap
+        if (el.scrollLeft <= 1) el.scrollLeft += half;
+        if (el.scrollLeft >= half + 1) el.scrollLeft -= half;
       }
 
       rafRef.current = requestAnimationFrame(step);
@@ -251,25 +309,20 @@ function VideoScrollRow({
     rafRef.current = requestAnimationFrame(step);
 
     return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener("resize", onResize);
       cancelAnimationFrame(rafRef.current);
       lastTsRef.current = 0;
     };
   }, [autoPxPerSec]);
 
   return (
-    <div className="px-4 sm:px-6 py-7">
+    <div className="px-4 py-7">
       <div
         ref={scrollerRef}
         className="overflow-x-auto pb-3"
-        style={{
-          WebkitOverflowScrolling: "touch",
-          touchAction: "pan-x pan-y",
-        }}
-        onMouseEnter={() => (holdRef.current = true)}
-        onMouseLeave={() => {
-          holdRef.current = false;
-          pauseFor(900);
-        }}
+        style={{ WebkitOverflowScrolling: "touch", touchAction: "pan-x pan-y" }}
         onTouchStart={() => (holdRef.current = true)}
         onTouchEnd={() => {
           holdRef.current = false;
@@ -280,18 +333,22 @@ function VideoScrollRow({
           holdRef.current = false;
           pauseFor(1200);
         }}
-        onScroll={() => pauseFor(1500)}
+        onScroll={() => {
+          // ✅ ignore auto-scroll scroll events
+          if (Date.now() < ignoreScrollUntilRef.current) return;
+          pauseFor(1500);
+        }}
       >
         <div className="flex w-max gap-5">
           {items.map((it) => (
-            <div key={it.id} className="shrink-0 w-[min(82vw,320px)] sm:w-[360px]">
+            <div key={it.rid} className="shrink-0 w-[min(82vw,320px)]">
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <div className="relative aspect-[9/16] bg-gray-100">
                   <video
-                    ref={setVideoRef(it.id)}
-                    onVolumeChange={() => onVolumeChange(it.id)}
-                    onPlay={() => onPlay(it.id)}
-                    onClick={() => onFullscreen(it.id)} // mobile tap fullscreen
+                    ref={setVideoRef(it.rid)}
+                    onVolumeChange={() => onVolumeChange(it.rid)}
+                    onPlay={() => onPlay(it.rid)}
+                    onClick={() => onFullscreen(it.rid)}
                     src={it.src}
                     className="h-full w-full object-cover"
                     autoPlay
@@ -306,6 +363,48 @@ function VideoScrollRow({
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================
+   ✅ DESKTOP: Continuous rolling marquee
+   ========================================= */
+function VideoMarqueeRowDesktop({
+  items,
+  speedSec = 55,
+  setVideoRef,
+  onVolumeChange,
+  onPlay,
+}) {
+  return (
+    <div className="px-6 py-8">
+      <div
+        className="hn-track flex w-max gap-5 will-change-transform"
+        style={{ animation: `hn_marquee_left ${speedSec}s linear infinite` }}
+      >
+        {items.map((it) => (
+          <div key={it.rid} className="shrink-0 sm:w-[360px]">
+            <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+              <div className="relative aspect-[9/16] bg-gray-100">
+                <video
+                  ref={setVideoRef(it.rid)}
+                  onVolumeChange={() => onVolumeChange(it.rid)}
+                  onPlay={() => onPlay(it.rid)}
+                  src={it.src}
+                  className="h-full w-full object-cover"
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  controls
+                  preload="metadata"
+                />
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
