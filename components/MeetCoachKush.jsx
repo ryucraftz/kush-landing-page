@@ -14,7 +14,7 @@ export default function MeetCoachKush() {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto">
           <h2 className="mt-4 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-tight text-gray-900">
-            Meet Your Coach <span className="text-sky-700">Kush Solanki</span>
+            Meet Your Coach <span className="text-sky-700">Kush Rathor</span>
           </h2>
 
           <p className="mt-4 text-base sm:text-lg text-gray-600">
@@ -34,7 +34,7 @@ export default function MeetCoachKush() {
                 <div className="aspect-[4/5] sm:aspect-[5/6] lg:aspect-[4/5]">
                   <img
                     src={coachImg}
-                    alt="Coach Kush Solanki"
+                    alt="Coach Kush Rathor"
                     // ✅ FIX: avoid cutting head by using contain + top alignment
                     className="h-full w-full object-contain object-top"
                     loading="lazy"
@@ -64,7 +64,7 @@ export default function MeetCoachKush() {
 
               <div className="mt-4 text-center">
                 <p className="text-lg sm:text-xl font-extrabold text-gray-900">
-                  Kush Solanki
+                  Kush Rathor
                 </p>
                 <p className="mt-1 text-sm text-gray-600">
                   Fitness Coach &amp; Nutritionist

@@ -1,37 +1,29 @@
-import { useState } from "react";
-import "./App.css";
+import { Routes, Route } from "react-router-dom";
+import ScrollToTop from "./hooks/ScrollToTop";
 
-import Review from "../components/Review";
-import Hero from "../components/Hero";
-import VideoSection from "../components/VideoSection";
-import CallToActionButton from "../components/CallToActionButton";
-import MeetCoachKush from "../components/MeetCoachKush";
-import PhotoTestimonials from "../components/PhotoTestimonials";
-import VideoTestimonialSection from "../components/VideoTestimonialSection";
-import FitDadWhySystemWorks from "../components/FitDadWhySystemWorks";
-import OurPromise from "../components/OurPromise";
-
-import StickyBar from "../components/StickyBar"; 
+import Home from "./pages/Home";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Refund from "./pages/Refund";
+import Cancellation from "./pages/Cancellation";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
+import Footer from "./components/Footer";
 
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
     <>
-      <div className="pb-28 sm:pb-32">
-        <Review />
-        <Hero />
-        <VideoSection />
-        <CallToActionButton />
-        <PhotoTestimonials />
-        <VideoTestimonialSection />
-        <MeetCoachKush />
-        <FitDadWhySystemWorks />
-        <OurPromise />
-        <CallToActionButton />
-      </div>
-
-      <StickyBar />
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/refund" element={<Refund />} />
+        <Route path="/cancellation" element={<Cancellation />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
+      <Footer />
     </>
   );
 }
