@@ -86,9 +86,6 @@ export default function VideoSection() {
               class="absolute inset-0 w-full h-full"
               media-id={MEDIA_ID}
               aspect="1.7777777777777777"
-              autoplay="true"
-              muted="true"
-              silent-autoplay="true"
             ></wistia-player>
           </div>
         </div>
