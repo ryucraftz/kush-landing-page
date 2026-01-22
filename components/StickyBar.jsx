@@ -15,30 +15,21 @@ const StickyBar = () => {
 
     const options = {
       key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: "50000",
+      amount: "900",
       currency: "INR",
-      name: "Acme Corp",
-      description: "Test Transaction",
-      image: "https://example.com/your_logo",
+      name: "Coach Kush",
+      description: "1:1 FitDad Transformation Call",
       handler: function (response) {
-        alert(JSON.stringify(response));
-      },
-      prefill: {
-        name: "Piyush Garg",
-        email: "youremail@example.com",
-        contact: "9999999999",
-      },
-      notes: {
-        address: "Razorpay Corporate Office",
+        window.location.href = "/thank-you";
       },
       theme: {
-        color: "#3399cc",
+        color: "#dc2626",
       },
     };
 
     const rzp1 = new window.Razorpay(options);
     rzp1.on("payment.failed", function (response) {
-      alert(JSON.stringify(response));
+      alert("Payment Failed. Please try again. " + response.error.description);
     });
 
     rzp1.open();
