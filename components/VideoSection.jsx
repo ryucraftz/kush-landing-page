@@ -1,9 +1,9 @@
 // VideoSection.jsx
 import React, { useEffect, useState } from "react";
 
-const MEDIA_ID = "02tvm1vsqw";
+const MEDIA_ID = "sj1htfp9fg";
 const SWATCH =
-  "https://fast.wistia.com/embed/medias/02tvm1vsqw/swatch";
+  "https://fast.wistia.com/embed/medias/sj1htfp9fg/swatch";
 
 function loadScriptOnce(src, { type } = {}) {
   return new Promise((resolve, reject) => {
@@ -68,9 +68,8 @@ export default function VideoSection() {
           >
             {/* Poster/Skeleton overlay (visible immediately) */}
             <div
-              className={`absolute inset-0 transition-opacity duration-500 ${
-                playerDefined ? "opacity-0 pointer-events-none" : "opacity-100"
-              }`}
+              className={`absolute inset-0 transition-opacity duration-500 ${playerDefined ? "opacity-0 pointer-events-none" : "opacity-100"
+                }`}
             >
               {/* subtle dark overlay */}
               <div className="absolute inset-0 bg-black/35" />
