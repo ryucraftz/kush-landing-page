@@ -19,7 +19,7 @@ export default function CallToActionButton() {
       name: "Coach Kush",
       description: "1:1 FitDad Transformation Call",
       handler: function (response) {
-        window.location.href = "/thank-you";
+        window.location.href = "https://cal.com/kushfitness-ys4wla/30min";
       },
       theme: {
         color: "#dc2626",
