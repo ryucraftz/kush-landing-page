@@ -119,7 +119,7 @@ export default function ThankYou() {
                         </h2>
                     </div>
 
-                    <PhotoTestimonials hideHeader={true} />
+                    <PhotoTestimonials hideHeader={true} stunningGrid={true} />
                 </div>
             </section>
 

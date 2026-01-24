@@ -21,7 +21,7 @@ import t16 from "../src/assets/Image Testimonials/16.png";
 import t17 from "../src/assets/Image Testimonials/17.png";
 import t18 from "../src/assets/Image Testimonials/18.png";
 
-export default function PhotoTestimonials({ hideHeader = false }) {
+export default function PhotoTestimonials({ hideHeader = false, stunningGrid = false }) {
   const DATA = [
     { img: t1 },
     { img: t2 },
@@ -137,22 +137,48 @@ export default function PhotoTestimonials({ hideHeader = false }) {
           </div>
         )}
 
-        {/* ✅ ONE ROW marquee (no white edge fade) */}
-        <div className="mt-8 sm:mt-12">
-          <div className="hn-marquee overflow-hidden rounded-3xl border border-sky-200 bg-white shadow-sm">
-            <MarqueeRow items={DATA} speed={90} />
+        {/* ✅ GRID vs MARQUEE */}
+        {stunningGrid ? (
+          <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+            {DATA.map((item, idx) => (
+              <div
+                key={idx}
+                className="group relative bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border border-slate-100"
+              >
+                <div className="aspect-[4/5] w-full overflow-hidden bg-slate-100">
+                  <img
+                    src={item.img}
+                    alt={`Transformation ${idx + 1}`}
+                    className="h-full w-full object-cover object-center transform transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  {/* Overlay gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-6">
+                    <span className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-4 py-1.5 rounded-full text-xs font-bold tracking-wider">
+                      AMAZING RESULT
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <div className="mt-8 sm:mt-12">
+            <div className="hn-marquee overflow-hidden rounded-3xl border border-sky-200 bg-white shadow-sm">
+              <MarqueeRow items={DATA} speed={90} />
+            </div>
 
-          <div className="mt-6 rounded-3xl border border-sky-200 bg-white p-4 sm:p-5 shadow-sm">
-            <p className="text-sm sm:text-base font-semibold text-gray-900 text-center">
-              You’re not “too late.”
-              <span className="text-sky-700">
-                {" "}
-                You just need a system built for real life.
-              </span>
-            </p>
+            <div className="mt-6 rounded-3xl border border-sky-200 bg-white p-4 sm:p-5 shadow-sm">
+              <p className="text-sm sm:text-base font-semibold text-gray-900 text-center">
+                You’re not “too late.”
+                <span className="text-sky-700">
+                  {" "}
+                  You just need a system built for real life.
+                </span>
+              </p>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
