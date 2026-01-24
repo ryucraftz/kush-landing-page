@@ -1,14 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import client1 from "../src/assets/Video Testimonials/01.mp4";
-import client2 from "../src/assets/Video Testimonials/02.mp4";
-import client3 from "../src/assets/Video Testimonials/03.mp4";
-import client4 from "../src/assets/Video Testimonials/04.mp4";
-import client5 from "../src/assets/Video Testimonials/05.mp4";
-import client6 from "../src/assets/Video Testimonials/06.mp4";
-import client7 from "../src/assets/Video Testimonials/07.mp4";
-import client8 from "../src/assets/Video Testimonials/08.mp4";
-import client9 from "../src/assets/Video Testimonials/09.mp4";
+import client1 from "../src/assets/Video Testimonials/optimized/01.mp4";
+import client2 from "../src/assets/Video Testimonials/optimized/02.mp4";
+import client3 from "../src/assets/Video Testimonials/optimized/03.mp4";
+import client4 from "../src/assets/Video Testimonials/optimized/04.mp4";
+import client5 from "../src/assets/Video Testimonials/optimized/05.mp4";
+import client6 from "../src/assets/Video Testimonials/optimized/06.mp4";
+import client7 from "../src/assets/Video Testimonials/optimized/07.mp4";
+import client8 from "../src/assets/Video Testimonials/optimized/08.mp4";
+import client9 from "../src/assets/Video Testimonials/optimized/09.mp4";
 
 export default function VideoTestimonialSection({
   title = "Your Future Transformation Starts With Stories Like These.",
@@ -163,17 +163,17 @@ export default function VideoTestimonialSection({
 
     try {
       await v.play();
-    } catch {}
+    } catch { }
 
     try {
       if (v.requestFullscreen) await v.requestFullscreen();
       else if (v.webkitRequestFullscreen) v.webkitRequestFullscreen();
       else if (v.webkitEnterFullscreen) v.webkitEnterFullscreen(); // iPhone Safari
-    } catch {}
+    } catch { }
 
     try {
       await v.play();
-    } catch {}
+    } catch { }
   };
 
   return (
@@ -344,8 +344,8 @@ function VideoScrollRowMobile({
             <div key={it.rid} className="shrink-0 w-[min(82vw,320px)]">
               <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
                 <div className="relative aspect-[9/16] bg-gray-100">
-                  <video
-                    ref={setVideoRef(it.rid)}
+                  <LazyVideo
+                    videoRef={setVideoRef(it.rid)}
                     onVolumeChange={() => onVolumeChange(it.rid)}
                     onPlay={() => onPlay(it.rid)}
                     onClick={() => onFullscreen(it.rid)}
@@ -356,7 +356,7 @@ function VideoScrollRowMobile({
                     muted
                     playsInline
                     controls
-                    preload="metadata"
+                    preload="none"
                   />
                 </div>
               </div>
@@ -388,8 +388,8 @@ function VideoMarqueeRowDesktop({
           <div key={it.rid} className="shrink-0 sm:w-[360px]">
             <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
               <div className="relative aspect-[9/16] bg-gray-100">
-                <video
-                  ref={setVideoRef(it.rid)}
+                <LazyVideo
+                  videoRef={setVideoRef(it.rid)}
                   onVolumeChange={() => onVolumeChange(it.rid)}
                   onPlay={() => onPlay(it.rid)}
                   src={it.src}
@@ -399,7 +399,7 @@ function VideoMarqueeRowDesktop({
                   muted
                   playsInline
                   controls
-                  preload="metadata"
+                  preload="none"
                 />
               </div>
             </div>
@@ -407,5 +407,48 @@ function VideoMarqueeRowDesktop({
         ))}
       </div>
     </div>
+  );
+}
+
+/* =========================================
+   ✅ LAZY VIDEO COMPONENT
+   Only loads/plays when near viewport
+   ========================================= */
+function LazyVideo({ src, videoRef, ...props }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const localRef = useRef(null);
+
+  useEffect(() => {
+    // Only set up observer if not already loaded
+    if (isLoaded) return;
+
+    const el = localRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsLoaded(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" } // Load a bit before it comes into view
+    );
+
+    observer.observe(el);
+
+    return () => observer.disconnect();
+  }, [isLoaded]);
+
+  return (
+    <video
+      ref={(node) => {
+        localRef.current = node;
+        // Forward the ref to parent's setVideoRef
+        if (typeof videoRef === "function") videoRef(node);
+      }}
+      src={isLoaded ? src : undefined}
+      {...props}
+    />
   );
 }
