@@ -21,7 +21,7 @@ import t16 from "../src/assets/Image Testimonials/16.png";
 import t17 from "../src/assets/Image Testimonials/17.png";
 import t18 from "../src/assets/Image Testimonials/18.png";
 
-export default function PhotoTestimonials() {
+export default function PhotoTestimonials({ hideHeader = false }) {
   const DATA = [
     { img: t1 },
     { img: t2 },
@@ -61,79 +61,81 @@ export default function PhotoTestimonials() {
 
       <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-10">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto">
-          <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 shadow-sm">
-            <span className="h-2 w-2 rounded-full bg-sky-600" />
-            <p className="text-xs sm:text-sm font-extrabold tracking-[0.22em] uppercase text-sky-800">
-              Social Proof
-            </p>
-            <span className="h-2 w-2 rounded-full bg-yellow-300" />
-          </div>
+        {!hideHeader && (
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-sky-50 px-4 py-2 shadow-sm">
+              <span className="h-2 w-2 rounded-full bg-sky-600" />
+              <p className="text-xs sm:text-sm font-extrabold tracking-[0.22em] uppercase text-sky-800">
+                Social Proof
+              </p>
+              <span className="h-2 w-2 rounded-full bg-yellow-300" />
+            </div>
 
-          {/* Mobile */}
-          <h2 className="mt-5 text-2xl font-extrabold leading-tight text-gray-900 sm:hidden">
-            These Parents &amp; Busy Dads Were
-            <br />
-            <span className="text-sky-700">Tired, Stressed, and</span>
-            <br />
-            <span className="text-sky-700">Out of Shape.</span>
-          </h2>
+            {/* Mobile */}
+            <h2 className="mt-5 text-2xl font-extrabold leading-tight text-gray-900 sm:hidden">
+              These Parents &amp; Busy Dads Were
+              <br />
+              <span className="text-sky-700">Tired, Stressed, and</span>
+              <br />
+              <span className="text-sky-700">Out of Shape.</span>
+            </h2>
 
-          <div className="mt-3 flex justify-center sm:hidden">
-            <span className="inline-flex items-center gap-3 rounded-2xl border border-sky-200 bg-white px-4 py-2 shadow-md">
-              <span className="grid h-8 w-8 place-items-center rounded-xl bg-sky-700 text-white shadow-sm">
-                <Quote className="h-4 w-4" />
-              </span>
-              <span className="text-sm font-extrabold text-gray-900">
-                <span className="text-sky-700">Just Like You.</span>
-              </span>
-            </span>
-          </div>
-
-          {/* Desktop */}
-          <h2 className="hidden sm:block mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.08] text-gray-900">
-            <span className="block">
-              These Parents &amp; Busy Dads{" "}
-              <span className="relative inline-block">
-                <span className="absolute -inset-x-2 -bottom-1 -z-10 h-4 rounded-full bg-sky-200/70" />
-                Were
-              </span>
-            </span>
-
-            <span className="block mt-2">
-              <span className="relative inline-block px-2">
-                <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-yellow-200/90" />
-                Tired
-              </span>
-              ,{" "}
-              <span className="relative inline-block px-2">
-                <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-sky-200/80" />
-                Stressed
-              </span>
-              , and{" "}
-              <span className="relative inline-block px-2">
-                <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-yellow-200/70" />
-                Out of Shape.
-              </span>
-            </span>
-
-            <span className="block mt-4">
+            <div className="mt-3 flex justify-center sm:hidden">
               <span className="inline-flex items-center gap-3 rounded-2xl border border-sky-200 bg-white px-4 py-2 shadow-md">
                 <span className="grid h-8 w-8 place-items-center rounded-xl bg-sky-700 text-white shadow-sm">
                   <Quote className="h-4 w-4" />
                 </span>
-                <span className="text-sm sm:text-base font-extrabold text-gray-900">
+                <span className="text-sm font-extrabold text-gray-900">
                   <span className="text-sky-700">Just Like You.</span>
                 </span>
               </span>
-            </span>
-          </h2>
+            </div>
 
-          <p className="mt-4 text-base font-semibold sm:text-lg text-gray-700">
-            Real people. Real routines. Real results — without extreme diets or
-            long workouts.
-          </p>
-        </div>
+            {/* Desktop */}
+            <h2 className="hidden sm:block mt-5 text-3xl sm:text-4xl md:text-5xl font-extrabold leading-[1.08] text-gray-900">
+              <span className="block">
+                These Parents &amp; Busy Dads{" "}
+                <span className="relative inline-block">
+                  <span className="absolute -inset-x-2 -bottom-1 -z-10 h-4 rounded-full bg-sky-200/70" />
+                  Were
+                </span>
+              </span>
+
+              <span className="block mt-2">
+                <span className="relative inline-block px-2">
+                  <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-yellow-200/90" />
+                  Tired
+                </span>
+                ,{" "}
+                <span className="relative inline-block px-2">
+                  <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-sky-200/80" />
+                  Stressed
+                </span>
+                , and{" "}
+                <span className="relative inline-block px-2">
+                  <span className="absolute inset-x-0 bottom-1 -z-10 h-3 rounded-full bg-yellow-200/70" />
+                  Out of Shape.
+                </span>
+              </span>
+
+              <span className="block mt-4">
+                <span className="inline-flex items-center gap-3 rounded-2xl border border-sky-200 bg-white px-4 py-2 shadow-md">
+                  <span className="grid h-8 w-8 place-items-center rounded-xl bg-sky-700 text-white shadow-sm">
+                    <Quote className="h-4 w-4" />
+                  </span>
+                  <span className="text-sm sm:text-base font-extrabold text-gray-900">
+                    <span className="text-sky-700">Just Like You.</span>
+                  </span>
+                </span>
+              </span>
+            </h2>
+
+            <p className="mt-4 text-base font-semibold sm:text-lg text-gray-700">
+              Real people. Real routines. Real results — without extreme diets or
+              long workouts.
+            </p>
+          </div>
+        )}
 
         {/* ✅ ONE ROW marquee (no white edge fade) */}
         <div className="mt-8 sm:mt-12">

@@ -1,82 +1,128 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { Instagram, Check } from 'lucide-react';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import { MessageCircle, Star } from "lucide-react";
+import PhotoTestimonials from "../../components/PhotoTestimonials";
+import coachImage from "../assets/coachprofile.jpg";
 
-const ThankYou = () => {
+// Reusing the coach image from existing assets
+const COACH_IMAGE_SRC = coachImage;
+
+const WHATSAPP_LINK = "https://wa.me/919876543210"; // 🔴 TODO: Replace with valid link
+
+export default function ThankYou() {
     return (
-        <div className="min-h-[80vh] flex items-center justify-center p-4">
-            <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden animate-fade-in-up border border-stone-100">
-                {/* Header Section with gradient */}
-                <div className="bg-gradient-to-br from-rose-50 to-orange-50 p-10 text-center relative overflow-hidden">
-                    {/* Decorative background circles */}
-                    <div className="absolute top-0 left-0 w-32 h-32 bg-rose-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 -translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-orange-100 rounded-full mix-blend-multiply filter blur-2xl opacity-70 translate-x-1/2 -translate-y-1/2"></div>
+        <div className="min-h-screen bg-slate-50 font-satoshi text-slate-900 selection:bg-amber-100 selection:text-amber-900 overflow-x-hidden">
 
-                    <div className="relative z-10">
-                        <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-lg mb-6 animate-bounce-slow">
-                            <Check className="h-10 w-10 text-rose-500" strokeWidth={3} />
+            {/* Navbar / Top items (Optional, keeping it clean for Thank You) */}
+
+            {/* 🌟 HERO SECTION */}
+            <section className="relative w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-24 md:pt-20 md:pb-32 flex flex-col md:flex-row gap-12 items-center justify-between">
+
+                {/* Background Gradients */}
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200/40 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 animate-blob pointer-events-none" />
+                <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-rose-200/40 rounded-full mix-blend-multiply filter blur-[128px] opacity-40 animate-blob animation-delay-2000 pointer-events-none" />
+
+                {/* LEFT CONTENT */}
+                <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="flex-1 w-full max-w-xl z-10 text-center"
+                >
+                    {/* Header Tag */}
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 border border-amber-200 rounded-full text-xs font-bold text-amber-700 mb-6 uppercase tracking-wider">
+                        <Star className="w-3 h-3 fill-amber-700" />
+                        FitDad Fitness
+                    </div>
+
+                    <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight mb-6">
+                        Thank You for <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">Joining Us!</span> 🙏
+                    </h1>
+
+                    <p className="text-lg text-slate-600 leading-relaxed mb-8">
+                        Welcome to FitDad Fitness Online! 🎉 We're thrilled to have you on board.
+                        You've just taken an incredible step towards a healthier, happier you.
+                    </p>
+
+                    {/* NOTE CARD */}
+                    <div className="bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-2xl p-6 sm:p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] mb-8 relative overflow-hidden group hover:border-amber-200/50 transition-colors text-left">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500" />
+
+                        <h3 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
+                            Note:
+                        </h3>
+                        <ul className="space-y-3">
+                            <li className="flex items-start gap-3 text-slate-600 text-sm sm:text-base">
+                                <div className="mt-1 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500 font-bold text-xs">1</div>
+                                <span>The meeting link has been sent to your email.</span>
+                            </li>
+                            <li className="flex items-start gap-3 text-slate-600 text-sm sm:text-base">
+                                <div className="mt-1 w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center shrink-0 text-slate-500 font-bold text-xs">2</div>
+                                <span>Our executive will call you and share details on WhatsApp before the consultation. Be ready at your scheduled time.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* CTA BUTTON */}
+                    <a
+                        href={WHATSAPP_LINK}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg shadow-green-200 transition-all transform hover:-translate-y-1 hover:shadow-green-300"
+                    >
+                        <MessageCircle className="w-6 h-6 fill-white" />
+                        Join Our Whatsapp Group
+                    </a>
+
+                </motion.div>
+
+                {/* RIGHT IMAGE (Card Style) */}
+                <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+                    className="flex-1 w-full max-w-lg relative z-10"
+                >
+                    <div className="relative aspect-[4/5] md:aspect-square bg-white rounded-3xl overflow-hidden shadow-2xl shadow-slate-200/50 border border-slate-100 group">
+                        {/* Decorative Logos Overlay (Mocking the screenshot structure) */}
+                        <div className="absolute top-6 left-6 z-20 flex gap-4">
+                            {/* Placeholders for ISSA/NASM logos */}
+                            <span className="font-black text-slate-300 text-xl tracking-tighter">ISSA</span>
                         </div>
-                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3 tracking-tight">Booking Confirmed!</h1>
-                        <p className="text-gray-600 text-lg leading-relaxed">
-                            Thanks for scheduling your call. <br className="hidden sm:block" />
-                            A calendar invitation has been sent to your email.
-                        </p>
-                    </div>
-                </div>
 
-                {/* Content Section */}
-                <div className="p-8 space-y-8 bg-white">
-                    <div className="space-y-4">
-                        <h2 className="text-xs font-bold text-gray-400 uppercase tracking-widest text-center">
-                            While you wait
+                        {/* Main Image */}
+                        <img
+                            src={COACH_IMAGE_SRC}
+                            alt="Coach Deepesh"
+                            className="w-full h-full object-cover transform scale-100 group-hover:scale-105 transition-transform duration-700"
+                        />
+
+                        {/* Bottom Overlay */}
+                        <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent p-8 pt-24 text-center">
+                            <div className="inline-block bg-white/10 backdrop-blur-md border border-white/20 px-4 py-1.5 rounded-full mb-2">
+                                <span className="text-white text-xs font-bold tracking-wide">- With Coach Deepesh</span>
+                            </div>
+                            <p className="text-slate-200 text-sm font-medium">Founder of FitDad Fitness</p>
+                        </div>
+                    </div>
+                </motion.div>
+
+            </section>
+
+            {/* 📸 REAL RESULTS SECTION */}
+            <section className="bg-white py-20 border-t border-slate-100 relative">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl md:text-5xl font-extrabold text-slate-900 mb-4">
+                            See Real People Achieve <span className="text-red-600 italic font-serif">Real Results!</span>
                         </h2>
-
-                        <a
-                            href="https://www.instagram.com/fitnessbykush/"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="group flex items-center justify-center w-full px-6 py-4 bg-gradient-to-r from-purple-600 via-pink-600 to-rose-600 text-white rounded-xl hover:shadow-lg hover:shadow-pink-500/30 transition-all duration-300 transform hover:-translate-y-0.5"
-                        >
-                            <Instagram className="w-6 h-6 mr-3 group-hover:scale-110 transition-transform" />
-                            <span className="font-semibold text-lg">Follow on Instagram</span>
-                        </a>
                     </div>
 
-                    <div className="pt-2 text-center">
-                        <Link
-                            to="/"
-                            className="text-gray-500 hover:text-gray-900 font-medium transition-colors text-sm flex items-center justify-center gap-2 group"
-                        >
-                            <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to Home
-                        </Link>
-                    </div>
+                    <PhotoTestimonials hideHeader={true} />
                 </div>
-            </div>
+            </section>
 
-            <style>{`
-                @keyframes fade-in-up {
-                    from {
-                        opacity: 0;
-                        transform: translate3d(0, 30px, 0);
-                    }
-                    to {
-                        opacity: 1;
-                        transform: translate3d(0, 0, 0);
-                    }
-                }
-                .animate-fade-in-up {
-                    animation: fade-in-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-                }
-                @keyframes bounce-slow {
-                    0%, 100% { transform: translateY(-5%); }
-                    50% { transform: translateY(0); }
-                }
-                .animate-bounce-slow {
-                    animation: bounce-slow 3s ease-in-out infinite;
-                }
-            `}</style>
         </div>
     );
-};
-
-export default ThankYou;
+}
