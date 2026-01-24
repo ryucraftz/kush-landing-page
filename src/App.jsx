@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import ScrollToTop from "./hooks/ScrollToTop";
 
 import Home from "./pages/Home";
@@ -12,6 +12,7 @@ import ThankYou from "./pages/ThankYou";
 import Footer from "./components/Footer";
 
 function App() {
+  const location = useLocation();
   return (
     <>
       <ScrollToTop />
@@ -25,7 +26,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/thank-you" element={<ThankYou />} />
       </Routes>
-      <Footer />
+      {!location.pathname.includes("/thank-you") && <Footer />}
     </>
   );
 }
