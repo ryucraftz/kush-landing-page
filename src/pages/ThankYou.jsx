@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Star } from "lucide-react";
 import PhotoTestimonials from "../../components/PhotoTestimonials";
+import ThankYouStickyBar from "../../components/ThankYouStickyBar";
 import coachImage from "../assets/coachprofile2.jpeg";
 
 // Reusing the coach image from existing assets
@@ -122,6 +123,8 @@ export default function ThankYou() {
                     <PhotoTestimonials hideHeader={true} stunningGrid={true} />
                 </div>
             </section>
+
+            <ThankYouStickyBar />
 
         </div>
     );
