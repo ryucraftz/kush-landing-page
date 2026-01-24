@@ -2,13 +2,10 @@ import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Star } from "lucide-react";
 import PhotoTestimonials from "../../components/PhotoTestimonials";
-import ThankYouStickyBar from "../../components/ThankYouStickyBar";
 import coachImage from "../assets/coachprofile2.jpeg";
 
 // Reusing the coach image from existing assets
 const COACH_IMAGE_SRC = coachImage;
-
-const WHATSAPP_LINK = "https://wa.me/919876543210"; // 🔴 TODO: Replace with valid link
 
 export default function ThankYou() {
     return (
@@ -66,15 +63,7 @@ export default function ThankYou() {
                     </div>
 
                     {/* CTA BUTTON */}
-                    <a
-                        href={WHATSAPP_LINK}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-[#25D366] hover:bg-[#20bd5a] text-white font-bold text-lg px-8 py-4 rounded-full shadow-lg shadow-green-200 transition-all transform hover:-translate-y-1 hover:shadow-green-300"
-                    >
-                        <MessageCircle className="w-6 h-6 fill-white" />
-                        Join Our Whatsapp Group
-                    </a>
+                    {/* CTA BUTTON REMOVED */}
 
                 </motion.div>
 
@@ -124,7 +113,7 @@ export default function ThankYou() {
                 </div>
             </section>
 
-            <ThankYouStickyBar />
+
 
         </div>
     );
