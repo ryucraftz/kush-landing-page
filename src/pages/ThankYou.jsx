@@ -95,7 +95,7 @@ export default function ThankYou() {
                         <img
                             src={COACH_IMAGE_SRC}
                             alt="Coach Kush"
-                            className="w-full h-full object-cover object-[50%_20%] transform scale-100 group-hover:scale-105 transition-transform duration-700"
+                            className="w-full h-full object-cover object-[50%_20%] transform scale-x-[-1] group-hover:scale-x-[-1] group-hover:scale-[1.05] transition-transform duration-700"
                         />
 
                         {/* Bottom Overlay */}
