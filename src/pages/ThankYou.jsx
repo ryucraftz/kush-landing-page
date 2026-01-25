@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { MessageCircle, Star } from "lucide-react";
 import PhotoTestimonials from "../../components/PhotoTestimonials";
@@ -8,6 +8,12 @@ import coachImage from "../assets/coachprofile2.jpeg";
 const COACH_IMAGE_SRC = coachImage;
 
 export default function ThankYou() {
+    useEffect(() => {
+        if (window.fbq) {
+            window.fbq('track', 'PageView');
+        }
+    }, []);
+
     return (
         <div className="min-h-screen bg-slate-50 font-satoshi text-slate-900 selection:bg-amber-100 selection:text-amber-900 overflow-x-hidden">
 

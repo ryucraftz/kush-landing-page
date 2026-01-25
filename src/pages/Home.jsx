@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Review from "../../components/Review";
 import Hero from "../../components/Hero";
 import VideoSection from "../../components/VideoSection";
@@ -11,6 +11,12 @@ import OurPromise from "../../components/OurPromise";
 import StickyBar from "../../components/StickyBar";
 
 function Home() {
+    useEffect(() => {
+        if (window.fbq) {
+            window.fbq('track', 'PageView');
+        }
+    }, []);
+
     return (
         <>
             <div className="pb-28 sm:pb-32">
