@@ -1,37 +1,9 @@
 import { motion } from "framer-motion";
-import useRazorpay from "../src/hooks/useRazorpay";
+
 
 export default function CallToActionButton() {
-  const isLoaded = useRazorpay();
-
-  const handlePayment = () => {
-    if (!isLoaded) return;
-
-    if (!import.meta.env.VITE_RAZORPAY_KEY_ID) {
-      alert("Error: Razorpay Key ID is missing. Please check Vercel Environment Variables.");
-      return;
-    }
-
-    const options = {
-      key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-      amount: "900", // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-      currency: "INR",
-      name: "Coach Kush",
-      description: "1:1 FitDad Transformation Call",
-      handler: function (response) {
-        window.location.href = "https://fitnessbykush.zohobookings.com/#/4699272000000050054";
-      },
-      theme: {
-        color: "#dc2626",
-      },
-    };
-
-    const rzp1 = new window.Razorpay(options);
-    rzp1.on("payment.failed", function (response) {
-      alert("Payment Failed. Please try again. " + response.error.description);
-    });
-
-    rzp1.open();
+  const handleBooking = () => {
+    window.location.href = "https://fitnessbykush.zohobookings.com/#/4699272000000050054";
   };
 
 
@@ -43,8 +15,7 @@ export default function CallToActionButton() {
       transition={{ duration: 0.5 }}
     >
       <motion.button
-        onClick={handlePayment}
-        disabled={!isLoaded}
+        onClick={handleBooking}
         className="
           relative inline-flex w-full sm:max-w-md
           items-center justify-center text-center
